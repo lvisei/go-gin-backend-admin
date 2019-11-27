@@ -1,20 +1,43 @@
 package main
 
 import (
+	"fmt"
+	"log"
+	"net/http"
+
 	"github.com/gin-gonic/gin"
-	"github.com/liuvigongzuoshi/go-gin-backend-admin/setting"
+
+	"go-gin-backend-admin/pkg/setting"
+	"go-gin-backend-admin/router"
 )
 
 func init() {
 	setting.Setup()
 }
 
+// @title Golang Gin API
+// @version 1.0
+// @description An example of gin Admin
+// @termsOfService https://github.com/liuvigongzuoshi/go-gin-backend-admin
+// @license.name MIT
+// @license.url https://github.com/liuvigongzuoshi/go-gin-backend-admin/blob/master/LICENSE
+// @host localhost:8000
 func main() {
-	r := gin.Default()
-	r.GET("/ping", func(c *gin.Context) {
-		c.JSON(200, gin.H{
-			"message": "pong",
-		})
-	})
-	r.Run() // listen and serve on 0.0.0.0:8080
+	gin.SetMode(setting.ServerSetting.AppMode)
+
+	routerInit := router.InitRouter()
+	readTimeout := setting.ServerSetting.ReadTimeout
+	writeTimeout := setting.ServerSetting.WriteTimeout
+	httpPort := fmt.Sprintf(":%d", setting.ServerSetting.HttpPort)
+
+	server := &http.Server{
+		Addr:         httpPort,
+		Handler:      routerInit,
+		ReadTimeout:  readTimeout,
+		WriteTimeout: writeTimeout,
+	}
+
+	log.Printf("[info] start http server listening %s", setting.AppSetting.PrefixUrl)
+
+	server.ListenAndServe()
 }
