@@ -7,12 +7,14 @@ import (
 
 	"github.com/gin-gonic/gin"
 
+	"go-gin-backend-admin/model"
 	"go-gin-backend-admin/pkg/setting"
 	"go-gin-backend-admin/router"
 )
 
 func init() {
 	setting.Setup()
+	model.Setup()
 }
 
 // @title Golang Gin API
