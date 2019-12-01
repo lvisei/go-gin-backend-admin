@@ -12,7 +12,7 @@ type App struct {
 	JwtSecret string
 	PageSize  int
 
-	//RuntimeRootPath string
+	RuntimeRootPath string
 
 	ImageSavePath  string
 	ImageMaxSize   int
