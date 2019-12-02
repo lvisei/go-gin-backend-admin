@@ -18,12 +18,12 @@ type auth struct {
 }
 
 // @Tags 用户模块
-// @Summary 登陆
+// @Summary 登陆授权
 // @Produce  json
-// @Param auth body auth true "登陆授权"
+// @Param auth body user.auth true "登陆授权"
 // @Success 200 {object} app.Response
 // @Failure 500 {object} app.Response
-// @Router /user/auth [post]
+// @Router /auth [post]
 func GetAuth(c *gin.Context) {
 	appG := app.Gin{C: c}
 	valid := validation.Validation{}

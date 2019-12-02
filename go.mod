@@ -5,6 +5,7 @@ module go-gin-backend-admin
 go 1.13
 
 require (
+	github.com/alecthomas/template v0.0.0-20190718012654-fb15b899a751
 	github.com/astaxie/beego v1.12.0
 	github.com/denisenkom/go-mssqldb v0.0.0-20190920000552-128d9f4ae1cd // indirect
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
@@ -17,6 +18,8 @@ require (
 	github.com/lib/pq v1.2.0 // indirect
 	github.com/mattn/go-isatty v0.0.10 // indirect
 	github.com/smartystreets/goconvey v1.6.4 // indirect
+	github.com/swaggo/gin-swagger v1.2.0
+	github.com/swaggo/swag v1.6.3
 	github.com/unknwon/com v1.0.1
 	golang.org/x/sys v0.0.0-20191126131656-8a8471f7e56d // indirect
 	google.golang.org/appengine v1.6.3 // indirect

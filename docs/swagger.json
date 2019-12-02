@@ -1,0 +1,83 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "An example of gin Admin",
+        "title": "Golang Gin API",
+        "termsOfService": "https://github.com/liuvigongzuoshi/go-gin-backend-admin",
+        "contact": {},
+        "license": {
+            "name": "MIT",
+            "url": "https://github.com/liuvigongzuoshi/go-gin-backend-admin/blob/master/LICENSE"
+        },
+        "version": "1.0"
+    },
+    "host": "localhost:8000",
+    "paths": {
+        "/auth": {
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "用户模块"
+                ],
+                "summary": "登陆授权",
+                "parameters": [
+                    {
+                        "description": "登陆授权",
+                        "name": "auth",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/user.auth"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/app.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/app.Response"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "app.Response": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "integer"
+                },
+                "data": {
+                    "type": "object"
+                },
+                "msg": {
+                    "type": "string"
+                }
+            }
+        },
+        "user.auth": {
+            "type": "object",
+            "properties": {
+                "password": {
+                    "type": "string",
+                    "example": "123456"
+                },
+                "username": {
+                    "type": "string",
+                    "example": "admin"
+                }
+            }
+        }
+    }
+}

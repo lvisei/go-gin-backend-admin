@@ -7,7 +7,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	// "go-gin-backend-admin/model"
+	"go-gin-backend-admin/model"
 	"go-gin-backend-admin/pkg/logging"
 	"go-gin-backend-admin/pkg/setting"
 	"go-gin-backend-admin/pkg/util"
@@ -16,7 +16,7 @@ import (
 
 func init() {
 	setting.Setup()
-	// model.Setup()
+	model.Setup()
 	logging.Setup()
 	util.Setup()
 }
