@@ -7,8 +7,7 @@ RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o go-gin-backend-ad
 FROM alpine:latest
 # RUN apk --no-cache add ca-certificates
 WORKDIR /go-gin-backend-admin
+COPY --from=builder go/src/go-gin-backend-admin/config ./config
 COPY --from=builder go/src/go-gin-backend-admin/go-gin-backend-admin .
-COPY --from=builder go/src/go-gin-backend-admin/docs .
-COPY --from=builder go/src/go-gin-backend-admin/config .
 EXPOSE 8000
 CMD ["./go-gin-backend-admin"]
