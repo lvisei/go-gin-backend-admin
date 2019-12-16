@@ -1,14 +1,44 @@
 definitions:
-  app.Response:
+  handler.Response:
     properties:
       code:
         type: integer
       data:
         type: object
-      msg:
+      message:
         type: string
     type: object
-  user.auth:
+  model.UserInfo:
+    properties:
+      createdOn:
+        type: string
+      email:
+        type: string
+      id:
+        type: integer
+      modifiedOn:
+        type: string
+      phone:
+        type: string
+      username:
+        type: string
+    type: object
+  user.CreateRequest:
+    properties:
+      email:
+        example: 82345611@gmail.com
+        type: string
+      password:
+        example: "123456"
+        type: string
+      phone:
+        example: "15845451515"
+        type: string
+      username:
+        example: admin
+        type: string
+    type: object
+  user.LoginRequest:
     properties:
       password:
         example: "123456"
@@ -17,7 +47,7 @@ definitions:
         example: admin
         type: string
     type: object
-host: localhost:8000
+host: api.ywbang.top
 info:
   contact: {}
   description: An example of gin Admin
@@ -28,28 +58,69 @@ info:
   title: Golang Gin API
   version: "1.0"
 paths:
-  /auth:
+  /user:
+    get:
+      parameters:
+      - description: token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: '{"code":20000,"message":"OK","data": UserInfo }'
+          schema:
+            $ref: '#/definitions/model.UserInfo'
+        "20003":
+          description: '{"code":20003,"message":"Token has timed out.","data": null
+            }'
+          schema:
+            $ref: '#/definitions/handler.Response'
+      summary: 获取当前登录用户的用户信息
+      tags:
+      - 用户模块
+  /user/login:
     post:
       parameters:
       - description: 登陆授权
         in: body
-        name: auth
+        name: user
         required: true
         schema:
-          $ref: '#/definitions/user.auth'
+          $ref: '#/definitions/user.LoginRequest'
           type: object
       produces:
       - application/json
       responses:
         "200":
-          description: OK
+          description: '{"code":20000,"message":"OK","data":{"token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE1MjgwMTY5MjIsImlkIjowLCJuYmYiOjE1MjgwMTY5MjIsInVzZXJuYW1lIjoiYWRtaW4ifQ.LjxrK9DuAwAzUD8-9v43NzWBN7HXsSLfebw92DKd1JQ"}}'
           schema:
-            $ref: '#/definitions/app.Response'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/app.Response'
+            $ref: '#/definitions/handler.Response'
       summary: 登陆授权
+      tags:
+      - 用户模块
+  /user/register:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: 用户注册
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/user.CreateRequest'
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: '{"code":20000,"data":{"name": "admin"},"msg":"ok"}'
+          schema:
+            $ref: '#/definitions/handler.Response'
+      summary: 用户注册
       tags:
       - 用户模块
 swagger: "2.0"

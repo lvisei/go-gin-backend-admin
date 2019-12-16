@@ -13,11 +13,11 @@ import (
 
 var db *gorm.DB
 
-type Model struct {
-	ID         int `gorm:"primary_key" json:"id"`
-	CreatedOn  int `json:"created_on"`
-	ModifiedOn int `json:"modified_on"`
-	DeletedOn  int `json:"deleted_on"`
+type BaseModel struct {
+	ID         uint64     `gorm:"primary_key;AUTO_INCREMENT;column:id" json:"-"`
+	CreatedOn  time.Time  `gorm:"default:current_time column:created_on" json:"-"`
+	ModifiedOn time.Time  `gorm:"default:current_time column:modified_on" json:"-"`
+	DeletedOn  *time.Time `gorm:"column:deleted_on" sql:"index" json:"-"`
 }
 
 // Setup initializes the database instance
@@ -53,7 +53,7 @@ func CloseDB() {
 // updateTimeStampForCreateCallback will set `CreatedOn`, `ModifiedOn` when creating
 func updateTimeStampForCreateCallback(scope *gorm.Scope) {
 	if !scope.HasError() {
-		nowTime := time.Now().Unix()
+		nowTime := time.Now().Format(time.RFC3339)
 		if createTimeField, ok := scope.FieldByName("CreatedOn"); ok {
 			if createTimeField.IsBlank {
 				createTimeField.Set(nowTime)
@@ -71,7 +71,7 @@ func updateTimeStampForCreateCallback(scope *gorm.Scope) {
 // updateTimeStampForUpdateCallback will set `ModifiedOn` when updating
 func updateTimeStampForUpdateCallback(scope *gorm.Scope) {
 	if _, ok := scope.Get("gorm:update_column"); !ok {
-		scope.SetColumn("ModifiedOn", time.Now().Unix())
+		scope.SetColumn("ModifiedOn", time.Now().Format(time.RFC3339))
 	}
 }
 
@@ -90,7 +90,7 @@ func deleteCallback(scope *gorm.Scope) {
 				"UPDATE %v SET %v=%v%v%v",
 				scope.QuotedTableName(),
 				scope.Quote(deletedOnField.DBName),
-				scope.AddToVars(time.Now().Unix()),
+				scope.AddToVars(time.Now().Format(time.RFC3339)),
 				addExtraSpaceIfExist(scope.CombinedConditionSql()),
 				addExtraSpaceIfExist(extraOption),
 			)).Exec()

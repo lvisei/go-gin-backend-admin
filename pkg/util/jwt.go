@@ -1,32 +1,46 @@
 package util
 
 import (
+	"errors"
 	"time"
 
-	"github.com/dgrijalva/jwt-go"
+	jwt "github.com/dgrijalva/jwt-go"
+	"github.com/gin-gonic/gin"
 )
 
-var jwtSecret []byte
+var (
+	// errMissingHeader means the `Authorization` header was empty.
+	errMissingHeader = errors.New("The length of the `Authorization` header is zero.")
+	jwtSecret        string
+)
 
-type Claims struct {
+// TokenContext is the Tokencontext of the JSON web token.
+type TokenContext struct {
+	ID       uint64 `json:"id"`
 	Username string `json:"username"`
 	Password string `json:"password"`
+}
+
+type Claims struct {
+	TokenContext
 	jwt.StandardClaims
 }
 
-/**
-生成token
-@param 	username 	用户名  	string
-@param 	password 	密码	   	string
-@returns token, err
-*/
-func GenerateToken(username, password string) (string, error) {
+// GenerateToken signs the Tokencontext with the specified secret.
+func GenerateToken(ctx TokenContext, secret string) (token string, err error) {
+	if secret == "" {
+		secret = jwtSecret
+	}
+
 	nowTime := time.Now()
-	expireTime := nowTime.Add(1 * time.Hour)
+	expireTime := nowTime.Add(1 * time.Hour / 2)
 
 	claims := Claims{
-		EncodeMD5(username),
-		EncodeMD5(password),
+		TokenContext{
+			ctx.ID,
+			ctx.Username,
+			ctx.Password,
+		},
 		jwt.StandardClaims{
 			ExpiresAt: expireTime.Unix(),
 			Issuer:    "go-gin-backend-admin",
@@ -34,26 +48,56 @@ func GenerateToken(username, password string) (string, error) {
 	}
 
 	tokenClaims := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	token, err := tokenClaims.SignedString(jwtSecret)
+
+	token, err = tokenClaims.SignedString([]byte(secret))
 
 	return token, err
 }
 
-/**
-解析token
-@param		token
-@returns 	token, err
-*/
-func ParseToken(token string) (*Claims, error) {
-	tokenClaims, err := jwt.ParseWithClaims(token, &Claims{}, func(token *jwt.Token) (interface{}, error) {
-		return jwtSecret, nil
-	})
+// secretFunc validates the secret format.
+func secretFunc(secret string) jwt.Keyfunc {
+	return func(token *jwt.Token) (interface{}, error) {
+		return []byte(secret), nil
+	}
+}
 
-	if tokenClaims != nil {
-		if claims, ok := tokenClaims.Claims.(*Claims); ok && tokenClaims.Valid {
-			return claims, nil
-		}
+// ParseToken validates the token with the specified secret,
+// and returns the Tokencontext if the token was valid.
+func ParseToken(token string, secret string) (*TokenContext, error) {
+	ctx := &TokenContext{}
+
+	if secret == "" {
+		secret = jwtSecret
 	}
 
-	return nil, err
+	// Parse the token.
+	tokenClaims, err := jwt.ParseWithClaims(token, &Claims{}, secretFunc(secret))
+
+	// Parse error.
+	if err != nil {
+		return ctx, err
+
+		// Read the token if it's valid.
+	} else if claims, ok := tokenClaims.Claims.(*Claims); ok && tokenClaims.Valid {
+		ctx.ID = claims.TokenContext.ID
+		ctx.Username = claims.TokenContext.Username
+		ctx.Password = claims.TokenContext.Password
+		return ctx, nil
+
+		// Other errors.
+	} else {
+		return ctx, err
+	}
+}
+
+// ParseRequestToken gets the token from the header and
+// pass it to the Parse function to parses the token.
+func ParseRequestToken(c *gin.Context) (*TokenContext, error) {
+	token := c.Request.Header.Get("Authorization")
+
+	if len(token) == 0 {
+		return &TokenContext{}, errMissingHeader
+	}
+
+	return ParseToken(token, jwtSecret)
 }

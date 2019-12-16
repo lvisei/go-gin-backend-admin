@@ -28,6 +28,7 @@ func init() {
 // @license.name MIT
 // @license.url https://github.com/liuvigongzuoshi/go-gin-backend-admin/blob/master/LICENSE
 // @host localhost:8000
+// @host api.ywbang.top
 func main() {
 	gin.SetMode(setting.ServerSetting.AppMode)
 

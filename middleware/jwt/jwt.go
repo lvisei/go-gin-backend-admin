@@ -1,48 +1,44 @@
 package jwt
 
 import (
-	"net/http"
-
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
 
-	"go-gin-backend-admin/pkg/consts"
+	"go-gin-backend-admin/handler"
+	"go-gin-backend-admin/pkg/errno"
 	"go-gin-backend-admin/pkg/util"
 )
 
 // JWT is jwt middleware
 func JWT() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		var code int
-		var data interface{}
+		handlerG := handler.Gin{C: c}
 
-		code = consts.SUCCESS
-		token := c.Query("token")
-		if token == "" {
-			code = consts.INVALID_PARAMS
-		} else {
-			_, err := util.ParseToken(token)
-			if err != nil {
-				switch err.(*jwt.ValidationError).Errors {
-				case jwt.ValidationErrorExpired:
-					code = consts.ERROR_AUTH_CHECK_TOKEN_TIMEOUT
-				default:
-					code = consts.ERROR_AUTH_CHECK_TOKEN_FAIL
-				}
-			}
-		}
+		token := c.Request.Header.Get("Authorization")
 
-		if code != consts.SUCCESS {
-			c.JSON(http.StatusUnauthorized, gin.H{
-				"code": code,
-				"msg":  consts.GetMsg(code),
-				"data": data,
-			})
-
+		if len(token) == 0 {
+			handlerG.Response(errno.ERROR_Not_TOKEN_EXIST, nil)
 			c.Abort()
 			return
 		}
 
+		ctx, err := util.ParseToken(token, "")
+		if err != nil {
+			switch err.(*jwt.ValidationError).Errors {
+			case jwt.ValidationErrorExpired:
+				err = errno.ERROR_AUTH_CHECK_TOKEN_TIMEOUT
+			default:
+				err = errno.ERROR_AUTH_CHECK_TOKEN_FAIL
+			}
+
+			handlerG.Response(err, nil)
+			c.Abort()
+			return
+		}
+
+		c.Set("jwt", ctx.ID)
+
 		c.Next()
+
 	}
 }

@@ -1,15 +1,16 @@
 package router
 
 import (
-	_ "go-gin-backend-admin/docs"
-	"go-gin-backend-admin/middleware/jwt"
-	"go-gin-backend-admin/router/user"
-
-	ginSwagger "github.com/swaggo/gin-swagger"
-	"github.com/swaggo/gin-swagger/swaggerFiles"
+	"net/http"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
+	ginSwagger "github.com/swaggo/gin-swagger"
+	"github.com/swaggo/gin-swagger/swaggerFiles"
+
+	_ "go-gin-backend-admin/docs"
+	"go-gin-backend-admin/handler/user"
+	"go-gin-backend-admin/middleware/jwt"
 )
 
 // InitRouter initialize routing information
@@ -19,30 +20,24 @@ func InitRouter() *gin.Engine {
 	r.Use(gin.Recovery())
 	r.Use(cors.Default())
 
+	// 404 Handler.
+	r.NoRoute(func(c *gin.Context) {
+		c.String(http.StatusNotFound, "The incorrect API route")
+	})
+
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 	// r.StaticFS("/upload/images", http.Dir(upload.GetImageFullPath()))
 
-	r.GET("/ping", func(c *gin.Context) {
-		c.JSON(200, gin.H{
-			"message": "pongs",
-		})
-	})
-
-	r.POST("/auth", user.GetAuth)
-	// r.POST("/upload", api.UploadImage)
-
-	user := r.Group("/user")
-	user.Use(jwt.JWT())
-
+	u := r.Group("/user")
 	{
-		user.GET("hello", func(c *gin.Context) {
-			c.JSON(200, gin.H{
-				"success": true,
-				"code":    200,
-				"message": "This works",
-				"data":    nil,
-			})
-		})
+		u.POST("/login", user.Login)
+		u.POST("/register", user.Create)
+	}
+
+	v1 := r.Group("/")
+	v1.Use(jwt.JWT())
+	{
+		v1.GET("/user", user.Get)
 	}
 
 	return r
