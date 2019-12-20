@@ -18,7 +18,13 @@ func InitRouter() *gin.Engine {
 	r := gin.New()
 	r.Use(gin.Logger())
 	r.Use(gin.Recovery())
-	r.Use(cors.Default())
+	r.Use(cors.New((func() cors.Config {
+		config := cors.DefaultConfig()
+		config.AddAllowHeaders("Authorization")
+		config.AllowAllOrigins = true
+		// config.AllowCredentials = true
+		return config
+	})()))
 
 	// 404 Handler.
 	r.NoRoute(func(c *gin.Context) {
