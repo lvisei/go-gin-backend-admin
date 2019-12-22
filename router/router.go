@@ -9,6 +9,7 @@ import (
 	"github.com/swaggo/gin-swagger/swaggerFiles"
 
 	_ "go-gin-backend-admin/docs"
+	"go-gin-backend-admin/handler/mock"
 	"go-gin-backend-admin/handler/user"
 	"go-gin-backend-admin/middleware/jwt"
 )
@@ -44,6 +45,11 @@ func InitRouter() *gin.Engine {
 	v1.Use(jwt.JWT())
 	{
 		v1.GET("/user", user.Get)
+	}
+
+	mock1 := r.Group("mock")
+	{
+		mock1.GET("sys/log/count", mock.SysLogCount)
 	}
 
 	return r
