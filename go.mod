@@ -8,6 +8,7 @@ require (
 	github.com/PuerkitoBio/purell v1.1.1-0.20180310210909-975f53781597 // indirect
 	github.com/alecthomas/template v0.0.0-20190718012654-fb15b899a751
 	github.com/astaxie/beego v1.12.0
+	github.com/brianvoe/gofakeit/v4 v4.2.0
 	github.com/denisenkom/go-mssqldb v0.0.0-20190920000552-128d9f4ae1cd // indirect
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/gin-contrib/cors v1.3.0

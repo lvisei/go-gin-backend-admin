@@ -50,6 +50,12 @@ func InitRouter() *gin.Engine {
 	mock1 := r.Group("mock")
 	{
 		mock1.GET("sys/log/count", mock.SysLogCount)
+		mock1.GET("user/search", mock.Search)
+		mock1.GET("user/login/out", mock.ResponseOk)
+		mock1.POST("user/insert", mock.ResponseOk)
+		mock1.POST("user/update", mock.ResponseOk)
+		mock1.POST("user/disable", mock.ResponseOk)
+		mock1.POST("user/delete", mock.ResponseOk)
 	}
 
 	return r
