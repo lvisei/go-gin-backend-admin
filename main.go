@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"syscall"
 
 	"github.com/gin-gonic/gin"
 
@@ -45,6 +46,8 @@ func main() {
 	}
 
 	log.Printf("[info] start http server listening %s", setting.AppSetting.PrefixUrl)
+
+	log.Printf("Actual pid is %d", syscall.Getpid())
 
 	server.ListenAndServe()
 }
