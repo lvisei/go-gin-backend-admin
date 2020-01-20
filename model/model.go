@@ -54,13 +54,13 @@ func CloseDB() {
 func updateTimeStampForCreateCallback(scope *gorm.Scope) {
 	if !scope.HasError() {
 		nowTime := time.Now().Format(time.RFC3339)
-		if createTimeField, ok := scope.FieldByName("CreatedOn"); ok {
+		if createTimeField, ok := scope.FieldByName("created_on"); ok {
 			if createTimeField.IsBlank {
 				createTimeField.Set(nowTime)
 			}
 		}
 
-		if modifyTimeField, ok := scope.FieldByName("ModifiedOn"); ok {
+		if modifyTimeField, ok := scope.FieldByName("modified_on"); ok {
 			if modifyTimeField.IsBlank {
 				modifyTimeField.Set(nowTime)
 			}
@@ -71,7 +71,7 @@ func updateTimeStampForCreateCallback(scope *gorm.Scope) {
 // updateTimeStampForUpdateCallback will set `ModifiedOn` when updating
 func updateTimeStampForUpdateCallback(scope *gorm.Scope) {
 	if _, ok := scope.Get("gorm:update_column"); !ok {
-		scope.SetColumn("ModifiedOn", time.Now().Format(time.RFC3339))
+		scope.SetColumn("modified_on", time.Now().Format(time.RFC3339))
 	}
 }
 
@@ -83,7 +83,7 @@ func deleteCallback(scope *gorm.Scope) {
 			extraOption = fmt.Sprint(str)
 		}
 
-		deletedOnField, hasDeletedOnField := scope.FieldByName("DeletedOn")
+		deletedOnField, hasDeletedOnField := scope.FieldByName("deleted_on")
 
 		if !scope.Search.Unscoped && hasDeletedOnField {
 			scope.Raw(fmt.Sprintf(
