@@ -47,7 +47,7 @@ definitions:
         example: admin
         type: string
     type: object
-host: api.ywbang.top
+host: api.ywbang.icu
 info:
   contact: {}
   description: An example of gin Admin
@@ -74,8 +74,7 @@ paths:
           schema:
             $ref: '#/definitions/model.UserInfo'
         "20003":
-          description: '{"code":20003,"message":"Token has timed out.","data": null
-            }'
+          description: '{"code":20003,"message":"Token has timed out.","data": null }'
           schema:
             $ref: '#/definitions/handler.Response'
       summary: 获取当前登录用户的用户信息
@@ -90,7 +89,6 @@ paths:
         required: true
         schema:
           $ref: '#/definitions/user.LoginRequest'
-          type: object
       produces:
       - application/json
       responses:
@@ -112,7 +110,6 @@ paths:
         required: true
         schema:
           $ref: '#/definitions/user.CreateRequest'
-          type: object
       produces:
       - application/json
       responses:

@@ -11,7 +11,7 @@
         },
         "version": "1.0"
     },
-    "host": "api.ywbang.top",
+    "host": "api.ywbang.icu",
     "paths": {
         "/user": {
             "get": {
@@ -63,7 +63,6 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "type": "object",
                             "$ref": "#/definitions/user.LoginRequest"
                         }
                     }
@@ -97,7 +96,6 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "type": "object",
                             "$ref": "#/definitions/user.CreateRequest"
                         }
                     }
