@@ -13,10 +13,12 @@ import (
 
 var db *gorm.DB
 
+const TimeFormat = "2006-01-02 15:04:05"
+
 type BaseModel struct {
 	ID         uint64     `gorm:"primary_key;AUTO_INCREMENT;column:id" json:"-"`
-	CreatedOn  time.Time  `gorm:"default:current_time column:created_on" json:"-"`
-	ModifiedOn time.Time  `gorm:"default:current_time column:modified_on" json:"-"`
+	CreatedOn  time.Time  `gorm:"column:created_on" json:"-"`
+	ModifiedOn time.Time  `gorm:"column:modified_on" json:"-"`
 	DeletedOn  *time.Time `gorm:"column:deleted_on" sql:"index" json:"-"`
 }
 
@@ -53,14 +55,14 @@ func CloseDB() {
 // updateTimeStampForCreateCallback will set `CreatedOn`, `ModifiedOn` when creating
 func updateTimeStampForCreateCallback(scope *gorm.Scope) {
 	if !scope.HasError() {
-		nowTime := time.Now().Format(time.RFC3339)
-		if createTimeField, ok := scope.FieldByName("created_on"); ok {
+		nowTime := time.Now().Format(TimeFormat)
+		if createTimeField, ok := scope.FieldByName("CreatedOn"); ok {
 			if createTimeField.IsBlank {
 				createTimeField.Set(nowTime)
 			}
 		}
 
-		if modifyTimeField, ok := scope.FieldByName("modified_on"); ok {
+		if modifyTimeField, ok := scope.FieldByName("ModifiedOn"); ok {
 			if modifyTimeField.IsBlank {
 				modifyTimeField.Set(nowTime)
 			}
@@ -71,7 +73,7 @@ func updateTimeStampForCreateCallback(scope *gorm.Scope) {
 // updateTimeStampForUpdateCallback will set `ModifiedOn` when updating
 func updateTimeStampForUpdateCallback(scope *gorm.Scope) {
 	if _, ok := scope.Get("gorm:update_column"); !ok {
-		scope.SetColumn("modified_on", time.Now().Format(time.RFC3339))
+		scope.SetColumn("ModifiedOn", time.Now().Format(TimeFormat))
 	}
 }
 
@@ -83,14 +85,14 @@ func deleteCallback(scope *gorm.Scope) {
 			extraOption = fmt.Sprint(str)
 		}
 
-		deletedOnField, hasDeletedOnField := scope.FieldByName("deleted_on")
+		deletedOnField, hasDeletedOnField := scope.FieldByName("DeletedOn")
 
 		if !scope.Search.Unscoped && hasDeletedOnField {
 			scope.Raw(fmt.Sprintf(
 				"UPDATE %v SET %v=%v%v%v",
 				scope.QuotedTableName(),
 				scope.Quote(deletedOnField.DBName),
-				scope.AddToVars(time.Now().Format(time.RFC3339)),
+				scope.AddToVars(time.Now().Format(TimeFormat)),
 				addExtraSpaceIfExist(scope.CombinedConditionSql()),
 				addExtraSpaceIfExist(extraOption),
 			)).Exec()
