@@ -214,8 +214,8 @@ type swaggerInfo struct {
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = swaggerInfo{
 	Version:     "1.0",
-	Host:        "api.ywbang.icu",
-	BasePath:    "",
+	Host:        "",
+	BasePath:    "/",
 	Schemes:     []string{},
 	Title:       "Golang Gin API",
 	Description: "An example of gin Admin",

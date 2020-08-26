@@ -16,6 +16,9 @@ clean:
 	rm -rf go-gin-backend-admin
 	go clean -i .
 
+swagger:
+	swag init
+
 help:
 	@echo "make: compile packages and dependencies"
 	@echo "make tool: run specified go tool"

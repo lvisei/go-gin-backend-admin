@@ -18,7 +18,7 @@ import (
 func Create(c *gin.Context) {
 	handlerG := handler.Gin{C: c}
 
-	var u model.UserModel
+	var u model.User
 
 	if err := c.Bind(&u); err != nil {
 		handlerG.Response(errno.ErrBind, nil)

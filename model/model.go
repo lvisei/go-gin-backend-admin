@@ -16,10 +16,15 @@ var db *gorm.DB
 const TimeFormat = "2006-01-02 15:04:05"
 
 type BaseModel struct {
-	ID         uint64     `gorm:"primary_key;AUTO_INCREMENT;column:id" json:"-"`
-	CreatedOn  time.Time  `gorm:"column:created_on" json:"-"`
-	ModifiedOn time.Time  `gorm:"column:modified_on" json:"-"`
-	DeletedOn  *time.Time `gorm:"column:deleted_on" sql:"index" json:"-"`
+	ID         uint64  `gorm:"primary_key;column:id"`
+	CreatedOn  string  `gorm:"column:created_on"`
+	ModifiedOn string  `gorm:"column:modified_on"`
+	DeletedOn  *string `gorm:"column:deleted_on" sql:"index"`
+}
+
+// TableName table name
+func (BaseModel) TableName(name string) string {
+	return fmt.Sprintf("%s%s", setting.DatabaseSetting.TablePrefix, name)
 }
 
 // Setup initializes the database instance
@@ -35,9 +40,9 @@ func Setup() {
 		log.Fatalf("models.Setup err: %v", err)
 	}
 
-	gorm.DefaultTableNameHandler = func(db *gorm.DB, defaultTableName string) string {
-		return setting.DatabaseSetting.TablePrefix + defaultTableName
-	}
+	//gorm.DefaultTableNameHandler = func(db *gorm.DB, defaultTableName string) string {
+	//	return setting.DatabaseSetting.TablePrefix + defaultTableName
+	//}
 
 	db.SingularTable(true)
 	db.Callback().Create().Replace("gorm:update_time_stamp", updateTimeStampForCreateCallback)
@@ -45,6 +50,11 @@ func Setup() {
 	db.Callback().Delete().Replace("gorm:delete", deleteCallback)
 	db.DB().SetMaxIdleConns(10)
 	db.DB().SetMaxOpenConns(100)
+
+	db = db.Set("gorm:table_options", "ENGINE=InnoDB")
+	db.AutoMigrate(
+		new(User),
+	)
 }
 
 // CloseDB closes database connection (unnecessary)
