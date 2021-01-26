@@ -5,6 +5,9 @@ all: build
 build:
 	@go build -v .
 
+build-linux:
+	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o go-gin-backend-admin
+
 tool:
 	go vet ./...; true
 	gofmt -w .
